@@ -9,12 +9,15 @@ app.get('/', function(request, response) {
 });
 
 io.on('connection', function(socket) {
-    socket.on('chat.message', function(message) {
-        socket.userName = message.name
-        io.emit('chat.message', message);
+    socket.on('join', function(name){
+        socket.name = name;
+    })
+
+    socket.on('chat', function(message) {
+        io.emit('chat', message);
     });
 
     socket.on('disconnect', function() {
-        io.emit('chat.message', {name : socket.userName , chat : "disconected" });
+        io.emit('chat', {name : socket.name, chat : "disconected" });
     });
 });

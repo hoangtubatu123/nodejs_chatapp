@@ -21,8 +21,8 @@
     </ul>
 
     <form v-on="submit: send">
-        <input v-model="message">
-        <input v-model = "name">
+        <input v-model="message" placeholder="lời nhắn">
+        <input v-model = "name" placeholder= "tên người nói">
         <button>Send</button>
     </form>
 
@@ -38,13 +38,14 @@
                 name : '',
             },
             ready: function() {
-                socket.on('chat.message', function(message) {
+                socket.on('chat', function(message) {
                     this.messages.push(message);
                 }.bind(this));
             },
             methods: {
                 send: function(e) {
-                    socket.emit('chat.message', {name : this.name, chat : this.message});
+                    socket.emit('join', this.name)
+                    socket.emit('chat', {name : this.name, chat : this.message});
                     this.message = '';
                     e.preventDefault();
                 }
