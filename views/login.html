@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Login</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/0.12.15/vue.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body id = "login">
+
+<div class="container">
+  <form v-on="submit : login">
+    <div class="form-group">
+      <label for="email">username:</label>
+      <input  class="form-control" id="username" placeholder="nhập tên" name="username" v-model="username">
+    </div>
+    <div class="form-group">
+      <label for="pwd">Password:</label>
+      <input type="password" class="form-control" id="password" placeholder="nhập password" v-model = "password" name="password">
+    </div>
+    <button  class="btn btn-primary">Login</button>
+    <a href="register.html" type="submit" class="btn btn-primary" style="background-color: blue">Không có tài khoản. Đăng kí tại đây</button>
+  </form>
+</div>
+
+</body>
+</html>
+<script>
+  var socket = io()
+  const string = "http://localhost:3000"
+        new Vue({
+            el: '#login',
+            data: {
+                username : "",
+                password : "",
+               
+            },
+            methods : {
+              login : function (e){
+                e.preventDefault();
+                axios.post(string + "/login", {
+                  username : this.username,
+                  password : this.password
+                })
+                .then(async (res)=>{
+                     await socket.emit("join", this.username);
+                    //  window.location.href = string + "/index.html";
+                })
+                .catch(function(err){
+                    alert(err)
+                })
+              }
+            }
+
+
+          })
+</script>

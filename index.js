@@ -6,29 +6,32 @@ var mongoose = require("mongoose");
 var bodyParser = require("body-parser")
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
+var Chats  = require("./lib/Chats")
+var User = require("./lib/User")
 //set up database
 const conString = "mongodb://cuong:123456a@ds159020.mlab.com:59020/chatfriend"
 // const conString = "mongodb://localhost/test"
-var Chats = mongoose.model("Chats", {
-    name: String,
-    chat: String
-})
+
+
 
 mongoose.connect(conString, { useMongoClient: true }, (err) => {
     console.log("Database connection", err)
 })
 
 server.listen(3000);
-// app.get('/', function(request, response) {
-//     axios.get("https://www.facebook.com/nguyenhung.cuong.3532").then((res)=>{
-//         response.send(res.data);
-//     }).catch((error)=>{
-//         response.send(error);
-//     })
-//     // response.sendFile(__dirname + '/index.html');
-// });
+
+
+
+
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + "/index.html")
+    res.sendFile(__dirname + "/views/login.html")
+})
+app.get('/register.html', (req, res) => {
+    res.sendFile(__dirname + "/views/register.html")
+})
+app.get('/index.html', (req, res) => {
+    
+    res.sendFile(__dirname + "/views/index.html")
 })
 
 io.on('connection', function(socket) {
@@ -61,4 +64,29 @@ app.get("/chats", (req, res) => {
         res.send(chats)
     })
 })
+// login 
+app.post("/login", (req, res)=> {
+   User.findOne({username : req.body.username, password : req.body.password}, (err, user)=>{
+       if(err){
+           return res.status(500).send("Lỗi server")
+       }
+       if(!user){
+           return res.status(404).send("Không tồn tại người này");
+       }
+       return res.status(200).send(user)
+   })
+})
 
+// register
+app.post("/register", async(req, res)=>{
+    try {
+        var user = new User(req.body)
+        await user.save()
+        res.sendStatus(200);
+        res.send(user)
+    }
+    catch (err){
+        res.sendStatus(500);
+        res.send("Kiểm tra đường truyền")
+    }
+})

@@ -87,11 +87,9 @@
             ready: function () {
                 axios.get(string + "/chats").then(function (res) {
                     this.messages = res.data;
-
                 }.bind(this)).catch(err => console.log(err))
                 socket.on('join', function (message) {
                     this.messages.push(message)
-                    console.log(this.messages)
                 }.bind(this));
                 socket.on('chat', function (message) {
                     this.messages.push(message);
