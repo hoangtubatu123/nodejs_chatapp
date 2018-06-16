@@ -21,29 +21,32 @@ mongoose.connect(conString, { useMongoClient: true }, (err) => {
 server.listen(3000);
 
 
-
+// socket
 io.on('connection', function(socket) {
     socket.on('join', function(name){
         socket.name = name;
-        io.emit('chat', {name : name, chat : "Đã vào phòng chat"})
+        io.emit('chat', {sender : name, chat : "Đã vào phòng chat"})
     })
     socket.on('chat', function(message) {
         io.emit('chat', message);
     });
 
     socket.on('disconnect', function() {
-        io.emit('chat', {name : socket.name, chat : "disconected" });
+        io.emit('chat', {sender : socket.name, chat : "disconected" });
     });
 });
-
+// router
 app.get('/', (req, res) => {
     res.sendFile(__dirname + "/views/login.html")
 })
 app.get('/register.html', (req, res) => {
     res.sendFile(__dirname + "/views/register.html")
 })
-app.get('/index.html/:username', (req, res) => {
+app.get('/index.html/:sender/:receiver', (req, res) => {
     res.sendFile(__dirname + "/views/index.html")
+})
+app.get('/users.html/:username', (req, res) => {
+    res.sendFile(__dirname + "/views/users.html")
 })
 
 
@@ -58,8 +61,14 @@ app.post("/chats",  async(req, res) =>{
         console.error(error)
     }
 })
-app.get("/chats", (req, res) => {
-    Chats.find({}, (error, chats) => {
+app.get("/chats/:sender/:receiver", (req, res) => {
+    Chats.find({
+        $or : [
+            {sender : req.params.sender, receiver : req.params.receiver},
+            {sender : req.params.receiver, receiver : req.params.sender}
+        ]
+    }, (error, chats) => {
+        if(error) return res.status(500).send("Lỗi")
         res.send(chats)
     })
 })
@@ -96,4 +105,11 @@ app.post("/register", (req, res)=>{
         res.sendStatus(500);
         res.send("Kiểm tra đường truyền")
     }
+})
+//get friend simple
+app.get("/friends/:user", (req, res)=> {
+    User.find({username : {$ne:req.params.user}}, (err, users)=> {
+        if(err) return  res.status(500).send("Lỗi server")
+        res.send(users)
+    })
 })

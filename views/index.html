@@ -55,9 +55,9 @@
 
 <body id="chat">
     <ul id="messages">
-        <li v-repeat="message: messages">{{ message.name }} : {{message.chat}}</li>
+        <li v-repeat="message: messages">{{ message.sender }} : {{message.chat}}</li>
     </ul>
-    <button v-on="click :join">Nhập tên người nói chuyện</button>
+    <!-- <button v-on="click :join">Nhập tên người nói chuyện</button> -->
     <form v-on="submit: send">
         <input v-model="message" placeholder="lời nhắn">
         <!-- <input v-model = "name" placeholder= "tên người nói"> -->
@@ -75,13 +75,13 @@
             data: {
                 messages: [],
                 message: '',
-                name: url[url.length - 1],
+                name: url[url.length - 2],
+                receiver : url[url.length - 1]
             },
             ready: function  () {
-
-
-                axios.get(string + "/chats").then(function (res) {
+                axios.get(string + "/chats/" + this.name + "/" + this.receiver).then(function (res) {
                     this.messages = res.data;
+                    console.log(res.data)
                     socket.emit("join", this.name)
                 }.bind(this)).catch(err => console.log(err))
                 socket.on('join', function(message){
@@ -95,24 +95,25 @@
                 send: function (e) {
                     e.preventDefault();
                     axios.post(string + "/chats", {
-                        name: this.name,
-                        chat: this.message
+                        sender: this.name,
+                        chat: this.message,
+                        receiver : this.receiver
                     }).then(() => {
-                        socket.emit('chat', { name: this.name, chat: this.message });
+                        socket.emit('chat', { sender: this.name, chat: this.message });
                         this.message = '';
                         e.preventDefault()
                     }).catch((err) => {
-                        socket.emit('chat', { name: this.name, chat: "mất đường truyền tín hiệu" });
+                        socket.emit('chat', { sender: this.name, chat: "mất đường truyền tín hiệu" });
                         this.message = '';
                         e.preventDefault();
                     })
 
                 },
-                join: function () {
-                    var person = prompt("Please enter your name", "Come on");
-                    this.name = person;
-                    socket.emit("join", person)
-                }
+                // join: function () {
+                //     var person = prompt("Please enter your name", "Come on");
+                //     this.name = person;
+                //     socket.emit("join", person)
+                // }
 
             }
         })

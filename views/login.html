@@ -51,8 +51,8 @@
                   password : this.password
                 })
                 .then( (res)=>{
-                    
-                     window.location.href = string + "/index.html/" + res.data.username
+                    window.location.href = string + "/users.html/" + res.data.username
+                    //  window.location.href = string + "/index.html/" + res.data.username
                 })
                 .catch(function(err){
                     alert(err)
