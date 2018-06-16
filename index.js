@@ -22,18 +22,6 @@ server.listen(3000);
 
 
 
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + "/views/login.html")
-})
-app.get('/register.html', (req, res) => {
-    res.sendFile(__dirname + "/views/register.html")
-})
-app.get('/index.html', (req, res) => {
-    
-    res.sendFile(__dirname + "/views/index.html")
-})
-
 io.on('connection', function(socket) {
     socket.on('join', function(name){
         socket.name = name;
@@ -47,6 +35,17 @@ io.on('connection', function(socket) {
         io.emit('chat', {name : socket.name, chat : "disconected" });
     });
 });
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + "/views/login.html")
+})
+app.get('/register.html', (req, res) => {
+    res.sendFile(__dirname + "/views/register.html")
+})
+app.get('/index.html/:username', (req, res) => {
+    res.sendFile(__dirname + "/views/index.html")
+})
+
 
 //database
 app.post("/chats",  async(req, res) =>{
@@ -78,12 +77,20 @@ app.post("/login", (req, res)=> {
 })
 
 // register
-app.post("/register", async(req, res)=>{
+app.post("/register", (req, res)=>{
     try {
-        var user = new User(req.body)
-        await user.save()
-        res.sendStatus(200);
-        res.send(user)
+        User.findOne({username : req.body.username}, async (err, user)=> {
+            if(err){
+                return res.status(500).send("Lỗi server");
+            }
+            if(user){
+                return res.status(404).send("Người này đã tồn tại")
+            }
+            var user = new User(req.body)
+            await user.save()
+            res.sendStatus(200);
+            res.send(user)
+        })
     }
     catch (err){
         res.sendStatus(500);

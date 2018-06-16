@@ -11,6 +11,7 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/0.12.15/vue.min.js"></script>
+
 </head>
 <body id = "register">
 
@@ -61,8 +62,7 @@
                   email : this.email,
                 })
                 .then((res)=> {
-                   socket.emit("join", res.data.username);
-                  //  window.location.href = string + "/index.html";
+                   window.location.href = string + "/index.html/" +res.data.username ;
                 })
                 .catch((err) => {
                      alert(err)

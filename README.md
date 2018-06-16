@@ -4,4 +4,4 @@
 - npm install
 - node index.js
 #turn on 2 browser and enjoy the app 
-firstly, if you don't have an account, you must register; after that you will come in room chat
+#firstly, if you don't have an account, you must register; after that you will come in room chat
